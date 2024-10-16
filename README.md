@@ -1,0 +1,1 @@
+This is a Game liblary tracker that helps gamers share their preview of the game .The website also helps gamers find game titles in large collection with ease.Also the website keeps users informed a bout the latest trends in gaming
