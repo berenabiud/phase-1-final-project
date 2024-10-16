@@ -1,34 +1,87 @@
-// Wait for the DOM to fully load
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Get references to form elements
+document.addEventListener('DOMContentLoaded', () => {
+    // These lines select specific HTML elements by their IDs and assign them to constants for easy reference later in the code.
     const gameForm = document.getElementById('game-form');
-    const gameTitleInput = document.getElementById('game-title');
-    const gameGenreInput = document.getElementById('game-genre');
     const gameList = document.getElementById('game-list');
+    const ratingFilter = document.getElementById('rating-filter');
+    const releaseYearFilter = document.getElementById('release-year-filter');
 
-    // Handle form submission
-    gameForm.addEventListener('submit', function(event) {
-        event.preventDefault();  // Prevent the default form submission behavior
+    
+    const apiKey = 'bdaadfbc69b6442fb0a533ec2d7ccf87';//this is an api key that alllows me to access the games from from the aoi
 
-        // Get input values
-        const gameTitle = gameTitleInput.value.trim();
-        const gameGenre = gameGenreInput.value.trim();
+    //this line listens to the events
+    gameForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const gameTitle = document.getElementById('game-title').value;
+        const gameGenre = document.getElementById('game-genre').value;
 
-        if (gameTitle === '' || gameGenre === '') {
-            alert('Please enter both game title and genre');
+        // Fetch and render game data from RAWG API
+        fetchGameData(gameTitle, gameGenre);//Calls the fetchGameData function passing the game title and game genre as parameters
+    });
+
+    // Function to fetch game data from RAWG API
+    function fetchGameData(title, genre) {
+        const apiUrl = `https://api.rawg.io/api/games?key=${apiKey}&search=${title}`;
+        if (genre) {
+            apiUrl += `&genres=${genre.toLowerCase()}`;
+        }
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                applyFilters(data.results);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);//fetches any error during the fetch process
+            });
+    }
+
+    // Function to apply filters for rating and release year
+    function applyFilters(games) {
+        const filteredGames = games.filter(game => {//Uses the filter method to create a new array with games that match the criteria.
+            const selectedRating = ratingFilter.value;
+            const selectedYear = releaseYearFilter.value;
+            
+            let matchesRating = true;
+            if (selectedRating) {
+                matchesRating = Math.floor(game.rating) >= parseInt(selectedRating);
+            }
+
+            let matchesYear = true;
+            if (selectedYear && game.released) {
+                matchesYear = game.released.startsWith(selectedYear);
+            }
+
+            return matchesRating && matchesYear;
+        });
+
+        renderGames(filteredGames);//Calls the renderGames function to display the filtered games
+    }
+
+    function renderGames(games) {// takes an array of games and render them on display
+        // Clear any previous results
+        gameList.innerHTML = '';
+
+        if (games.length === 0) {
+            gameList.innerHTML = `<p class="text-center">No games found</p>`;
             return;
         }
 
-        // Create a new list item for the game
-        const listItem = document.createElement('li');
-        listItem.textContent = `Title: ${gameTitle}, Genre: ${gameGenre}`;
-        
-        // Add the new list item to the game list
-        gameList.appendChild(listItem);
-
-        // Clear the input fields
-        gameTitleInput.value = '';
-        gameGenreInput.value = '';
-    });
+        games.forEach(game => {
+            const gameCard = `
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="${game.background_image}" class="card-img-top" alt="${game.name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${game.name}</h5>
+                            <p class="card-text">Genre: ${game.genres.map(genre => genre.name).join(', ')}</p>
+                            <p class="card-text">Rating: ★${'★'.repeat(Math.floor(game.rating))} (${game.rating}/5)</p>
+                            <p class="card-text">Release Year: ${game.released ? game.released.substring(0, 4) : 'N/A'}</p>
+                            <button class="btn btn-primary">Details</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            gameList.innerHTML += gameCard;
+        });
+    }
 });
