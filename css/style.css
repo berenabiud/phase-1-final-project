@@ -1,4 +1,4 @@
-@import "..";
+@import "bootstrap";
 h1{
     text-align: center;
 }
@@ -33,5 +33,5 @@ input {
         font-size: 16px;
     }
     body{
-        background-color: black;
+        background-color: rgb(66, 11, 11);
     }
