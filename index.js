@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameList = document.getElementById('game-list');
     const ratingFilter = document.getElementById('rating-filter');
     const releaseYearFilter = document.getElementById('release-year-filter');
-
     const apiKey = 'bdaadfbc69b6442fb0a533ec2d7ccf87'; // Replace with your actual RAWG API key.
 
     // Event listener for the form submit
@@ -53,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGames(filteredGames);
     }
 
-    // Function to render the games with user rating feature
+    // Function to render the games with user rating and wishlist feature
     function renderGames(games) {
         gameList.innerHTML = ''; // Clear previous results
 
@@ -74,14 +73,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p class="card-text">Genre: ${game.genres.map(genre => genre.name).join(', ')}</p>
                             <p class="card-text">Rating: ★${'★'.repeat(Math.floor(game.rating))} (${game.rating}/5)</p>
                             <p class="card-text">Release Year: ${game.released ? game.released.substring(0, 4) : 'N/A'}</p>
-                            
+
+                            <!-- User Rating Section -->
                             <div>
                                 <label for="user-rating-${gameId}">Your Rating:</label>
                                 <input type="number" id="user-rating-${gameId}" class="form-control" min="1" max="5" placeholder="Rate 1-5">
-                                <button class="btn btn-primary mt-2" data-game-id="${gameId}" data-game-name="${game.name}">Submit Rating</button>
+                                <button type="button" class="btn btn-primary mt-2" data-game-id="${gameId}" data-game-name="${game.name}" data-action="rate">Submit Rating</button>
                             </div>
 
                             <p id="user-rating-display-${gameId}" class="mt-3"></p>
+
+                            <!-- Wishlist Button -->
+                            <button type="button" class="btn btn-secondary mt-2" data-game-id="${gameId}" data-game-name="${game.name}" data-action="wishlist">Add to Wishlist</button>
                         </div>
                     </div>
                 </div>
@@ -90,12 +93,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Event delegation for handling user rating submission
+    // Event delegation for handling user rating and wishlist submission
     gameList.addEventListener('click', (event) => {
-        if (event.target.tagName === 'BUTTON' && event.target.hasAttribute('data-game-id')) {
+        if (event.target.tagName === 'BUTTON') {
             const gameId = event.target.getAttribute('data-game-id');
             const gameName = event.target.getAttribute('data-game-name');
-            submitUserRating(gameId, gameName);
+            const action = event.target.getAttribute('data-action');
+
+            if (action === 'rate') {
+                submitUserRating(gameId, gameName);
+            } else if (action === 'wishlist') {
+                addToWishlist(gameId, gameName);
+            }
         }
     });
 
@@ -108,12 +117,106 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userRating >= 1 && userRating <= 5) {
             userRatingDisplay.innerHTML = `<strong>${gameName}</strong> - Your Rating: ★${'★'.repeat(userRating)} (${userRating}/5)`;
 
-            // Optionally store the user rating in localStorage
-            // localStorage.setItem(`userRating-${gameId}`, userRating);
+            // Save the rating to the JSON server
+            fetch('http://localhost:3000/ratings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ gameId, gameName, userRating }),
+            })
+            .then(() => {
+                console.log('Rating submitted to server');
+            })
+            .catch(error => {
+                console.error('Error submitting rating:', error);
+            });
 
             userRatingInput.value = ''; // Clear input after submission
         } else {
             alert('Please enter a rating between 1 and 5.');
         }
     }
+
+    // Function to add a game to the wishlist
+    function addToWishlist(gameId, gameName) {
+        fetch('http://localhost:3000/wishlists', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ gameId, gameName }),
+        })
+        .then(() => {
+            alert(`${gameName} has been added to your wishlist.`);
+            fetchWishlist(); // Refresh the wishlist after adding
+        })
+        .catch(error => {
+            console.error('Error adding to wishlist:', error);
+        });
+    }
+
+    // Fetch the wishlist when the page loads
+    fetchWishlist();
+
+    // Function to fetch and display the wishlist
+    function fetchWishlist() {
+        fetch('http://localhost:3000/wishlists') // Ensure the endpoint matches the correct collection
+            .then(response => response.json())
+            .then(data => {
+                const wishlist = data; // Access the wishlists array directly
+                const wishlistContainer = document.getElementById('wishlist');
+                wishlistContainer.innerHTML = ''; // Clear existing wishlist
+
+                if (wishlist.length === 0) {
+                    wishlistContainer.innerHTML = `<p class="text-center">Your wishlist is empty</p>`;
+                    return;
+                }
+
+                wishlist.forEach(item => {
+                    const wishlistItem = `
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">${item.gameName}</h5>
+                                    <button type="button" class="btn btn-danger mt-2" data-game-id="${item.gameId}" data-action="remove-wishlist">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    wishlistContainer.innerHTML += wishlistItem;
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching wishlist:', error);
+            });
+    }
+
+    // Event delegation for handling removing items from the wishlist
+    document.getElementById('wishlist').addEventListener('click', (event) => {
+        if (event.target.tagName === 'BUTTON' && event.target.getAttribute('data-action') === 'remove-wishlist') {
+            const gameId = event.target.getAttribute('data-game-id');
+            removeFromWishlists(gameId);
+        }
+    });
+
+    // Function to remove a game from the wishlist
+    function removeFromWishlists(gameId) {
+        fetch(`http://localhost:3000/wishlists/${gameId}`, { // Make sure this endpoint is correct
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Game removed from wishlist.');
+                fetchWishlist(); // Refresh the wishlist after removal
+            } else {
+                throw new Error('Failed to remove the game.'); // Handle error response
+            }
+        })
+        .catch(error => {
+            console.error('Error removing from wishlist:', error);
+            alert('There was an error removing the game from your wishlist. Please try again.');
+        });
+    }
 });
+

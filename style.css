@@ -25,7 +25,7 @@ input {
     }
     button {
         padding: 10px;
-        background-color: #00ff1e;
+        background-color: #272d98;
         color: white;
         border: none;
         border-radius: 4px;
@@ -35,4 +35,14 @@ input {
     body{
         background-color: rgb(96, 73, 73);
     }
-      
+#wishlist {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; 
+    }
+    .wishlist{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; 
+    }
+    
