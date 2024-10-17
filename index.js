@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const ratingFilter = document.getElementById('rating-filter');
     const releaseYearFilter = document.getElementById('release-year-filter');
     const apiKey = 'bdaadfbc69b6442fb0a533ec2d7ccf87'; 
+    
+    // Store user ratings and wishlist locally in memory
+    const userRatings = {};
+    const wishlist = [];
 
     // Event listener for the form submit
     gameForm.addEventListener('submit', (event) => {
@@ -115,45 +119,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const userRating = parseInt(userRatingInput.value);
 
         if (userRating >= 1 && userRating <= 5) {
+            // Store the user rating in the local object
+            userRatings[gameId] = userRating;
+
             userRatingDisplay.innerHTML = `<strong>${gameName}</strong> - Your Rating: ★${'★'.repeat(userRating)} (${userRating}/5)`;
 
-            // Save the rating to the JSON server
-            fetch('http://localhost:3000/ratings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ gameId, gameName, userRating }),
-            })
-            .then(() => {
-                console.log('Rating submitted to server');
-            })
-            .catch(error => {
-                console.error('Error submitting rating:', error);
-            });
-
             userRatingInput.value = ''; // Clear input after submission
+
+            console.log('Rating saved locally:', userRatings); // Log the saved ratings for reference
         } else {
             alert('Please enter a rating between 1 and 5.');
         }
     }
 
-    // Function to add a game to the wishlist
+    // Function to add a game to the wishlist locally
     function addToWishlist(gameId, gameName) {
-        fetch('http://localhost:3000/wishlists', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ gameId, gameName }),
-        })
-        .then(() => {
-            alert(`${gameName} has been added to your wishlist.`);
-            // fetchWishlist(); // Refresh the wishlist after adding
-        })
-        .catch(error => {
-            console.error('Error adding to wishlist:', error);
-        });
+        const gameExists = wishlist.some(item => item.gameId == gameId);
+        if (gameExists) {
+            alert(`${gameName} is already in your wishlist.`);
+            return;
+        }
+
+        wishlist.push({ gameId, gameName });
+        alert(`${gameName} has been added to your wishlist.`);
+        fetchWishlist(); // Immediately fetch and display the wishlist after adding
     }
 
     // Fetch the wishlist when the page loads
@@ -161,35 +150,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to fetch and display the wishlist
     function fetchWishlist() {
-        fetch('http://localhost:3000/wishlists') // Ensure the endpoint matches the correct collection
-            .then(response => response.json())
-            .then(data => {
-                const wishlist = data; // Access the wishlists array directly
-                const wishlistContainer = document.getElementById('wishlist');
-                wishlistContainer.innerHTML = ''; // Clear existing wishlist
+        const wishlistContainer = document.getElementById('wishlist');
+        wishlistContainer.innerHTML = ''; // Clear existing wishlist
 
-                if (wishlist.length === 0) {
-                    wishlistContainer.innerHTML = `<p class="text-center">Your wishlist is empty</p>`;
-                    return;
-                }
+        if (wishlist.length === 0) {
+            wishlistContainer.innerHTML = `<p class="text-center">Your wishlist is empty</p>`;
+            return;
+        }
 
-                wishlist.forEach(item => {
-                    const wishlistItem = `
-                        <div class="col">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">${item.gameName}</h5>
-                                    <button type="button" class="btn btn-danger mt-2" data-game-id="${item.gameId}" data-action="remove-wishlist">Remove</button>
-                                </div>
-                            </div>
+        wishlist.forEach(item => {
+            const wishlistItem = `
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${item.gameName}</h5>
+                            <button type="button" class="btn btn-danger mt-2" data-game-id="${item.gameId}" data-action="remove-wishlist">Remove</button>
                         </div>
-                    `;
-                    wishlistContainer.innerHTML += wishlistItem;
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching wishlist:', error);
-            });
+                    </div>
+                </div>
+            `;
+            wishlistContainer.innerHTML += wishlistItem;
+        });
     }
 
     // Event delegation for handling removing items from the wishlist
@@ -200,42 +181,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Function to remove a game from the wishlist
+    // Function to remove a game from the wishlist locally
     function removeFromWishlists(gameId) {
-        console.log(`Attempting to delete game with ID: ${gameId}`);
-        
-        // Check if the game exists before trying to delete it
-        fetch(`http://localhost:3000/wishlists`)
-            .then(response => response.json())
-            .then(data => {
-                const gameExists = data.some(item => item.gameId == gameId);
-                if (!gameExists) {
-                    alert(`Game with ID ${gameId} does not exist in the wishlist.`);
-                    return;
-                }
-                
-                // Proceed to delete if game exists
-                return fetch(`http://localhost:3000/wishlists/${gameId}`, {
-                    method: 'DELETE',
-                });
-            })
-            .then(response => {
-                if (!response.ok) {
-                    // Log the response to see the error status and message
-                    console.error('Failed to remove game. Status:', response.status, 'Status Text:', response.statusText);
-                    throw new Error('Failed to remove the game.');
-                }
-                alert('Game removed from wishlist.');
-                // fetchWishlist(); // Refresh the wishlist after removal
-            })
-            .catch(error => {
-                console.error('Error removing from wishlist:', error);
-                alert('There was an error removing the game from your wishlist. Please try again.');
-            });
+        const updatedWishlist = wishlist.filter(item => item.gameId != gameId);
+        if (updatedWishlist.length === wishlist.length) {
+            alert(`Game with ID ${gameId} does not exist in the wishlist.`);
+            return;
+        }
+        // Update the local wishlist and UI
+        wishlist.length = 0;
+        wishlist.push(...updatedWishlist);
+        fetchWishlist(); // Refresh the wishlist after removal
+        alert('Game removed from wishlist.');
     }
-    
-    }
-    
-    
-);
-
+});
