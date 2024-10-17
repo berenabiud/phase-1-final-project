@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Library</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Corrected Bootstrap CDN version -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
     <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAAAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="image/x-icon">
-
 </head>
 <body>
     <div class="container">
@@ -17,7 +17,7 @@
         </header>
 
         <!-- Search and Filter Section -->
-        <section >
+        <section>
             <form id="game-form" class="d-flex justify-content-center gap-3">
                 <div class="form-group">
                     <label for="game-title" class="form-label">Game Title</label>
@@ -29,14 +29,6 @@
                 </div>
                 <button type="submit" class="btn btn-primary align-self-end">Search Game</button>
             </form>
-           <!-- Wishlist Section -->
-<div class="wishlist-section">
-    <h3 class="wishlist">Your Wishlist</h3>
-    <div id="wishlist" class="row">
-        <!-- Wishlist items will be rendered here -->
-    </div>
-</div>
-
 
             <!-- Filter options (e.g., Rating, Release Date, etc.) -->
             <div class="mt-4 d-flex justify-content-center gap-3">
@@ -61,17 +53,24 @@
             </div>
         </section>
 
-        <section>
+        <!-- Game List Section -->
+        <section class="mt-4">
             <div id="game-list" class="row row-cols-1 row-cols-md-3 g-4">
                 <!-- Game cards will be inserted here dynamically -->
             </div>
         </section>
+
+        <!-- Wishlist Section -->
+        <section class="mt-4">
+            <h3 class="text-center">Your Wishlist</h3>
+            <div id="wishlist" class="row">
+                <!-- Wishlist items will be rendered here -->
+            </div>
+        </section>
     </div>
-    <!-- Wishlist Section -->
 
-</div>
-
-   
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./index.js"></script>
 </body>
 </html>
