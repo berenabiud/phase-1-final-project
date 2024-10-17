@@ -1,0 +1,48 @@
+{
+  "games": [
+    {
+      "id": "b125",
+      "gameId": "647552",
+      "gameName": "Call of Duty: Vanguard",
+      "userRating": 5
+    },
+    {
+      "id": "97f1",
+      "gameId": "18935",
+      "gameName": "Gal-X-E",
+      "userRating": 3
+    }
+  ],
+  "wishlists": [
+    {
+      "id": "7077",
+      "gameId": "647552",
+      "gameName": "Call of Duty: Vanguard"
+    },
+    {
+      "id": "2be2",
+      "gameId": "647552",
+      "gameName": "Call of Duty: Vanguard"
+    },
+    {
+      "id": "545e",
+      "gameId": "647552",
+      "gameName": "Call of Duty: Vanguard"
+    },
+    {
+      "id": "64dc",
+      "gameId": "4535",
+      "gameName": "Call of Duty 4: Modern Warfare"
+    },
+    {
+      "id": "60f0",
+      "gameId": "45783",
+      "gameName": "Loot'N Shoot"
+    },
+    {
+      "id": "e654",
+      "gameId": "475029",
+      "gameName": "Kahoot"
+    }
+  ]
+}

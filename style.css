@@ -1,15 +1,7 @@
- @import "bootstrap";
 h1{
     text-align: center;
-    position: fixed;
 }
-.container {
-    max-width: 600px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);} */}
+
 form {
         display: flex;
        flex-direction: row;}
@@ -26,7 +18,7 @@ input {
     }
     button {
         padding: 10px;
-        background-color: #00ff1e;
+        background-color: #272d98;
         color: white;
         border: none;
         border-radius: 4px;
@@ -34,6 +26,16 @@ input {
         font-size: 16px;
     }
     body{
-        background-color: rgb(66, 11, 11);
-    } 
-     
+        background-color: rgb(96, 73, 73);
+    }
+#wishlist {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; 
+    }
+    .wishlist{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; 
+    }
+    
