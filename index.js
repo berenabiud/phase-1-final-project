@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const gameForm = document.getElementById('game-form');
     const gameList = document.getElementById('game-list');
@@ -77,7 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             <p id="user-rating-display-${index}" class="user-rating-display"></p>
                             
+<<<<<<< Updated upstream
                             <button class="btn btn-danger">Delete</button>
+=======
+                            <button class="btn btn-danger">Details</button>
+>>>>>>> Stashed changes
                         </div>
                     </div>
                 </div>
@@ -94,7 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userRatingValue >= 1 && userRatingValue <= 5) {
             userRatingDisplay.innerHTML = `Your Rating: ★${'★'.repeat(userRatingValue)} (${userRatingValue}/5)`;
         } else {
+<<<<<<< Updated upstream
             userRatingDisplay.innerHTML = `<p class="text-danger">Please input a valid rating.</p>`;
+=======
+            userRatingDisplay.innerHTML = `<p class="text-danger">Please enter a valid rating between 1 and 5.</p>`;
+>>>>>>> Stashed changes
         }
     };
 });
+
+
