@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameList = document.getElementById('game-list');
     const ratingFilter = document.getElementById('rating-filter');
     const releaseYearFilter = document.getElementById('release-year-filter');
-    const apiKey = 'bdaadfbc69b6442fb0a533ec2d7ccf87'; // Replace with your actual RAWG API key.
+    const apiKey = 'bdaadfbc69b6442fb0a533ec2d7ccf87'; 
 
     // Event listener for the form submit
     gameForm.addEventListener('submit', (event) => {
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(() => {
             alert(`${gameName} has been added to your wishlist.`);
-            fetchWishlist(); // Refresh the wishlist after adding
+            // fetchWishlist(); // Refresh the wishlist after adding
         })
         .catch(error => {
             console.error('Error adding to wishlist:', error);
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error('Failed to remove the game.');
                 }
                 alert('Game removed from wishlist.');
-                fetchWishlist(); // Refresh the wishlist after removal
+                // fetchWishlist(); // Refresh the wishlist after removal
             })
             .catch(error => {
                 console.error('Error removing from wishlist:', error);
