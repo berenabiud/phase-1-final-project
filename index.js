@@ -202,21 +202,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to remove a game from the wishlist
     function removeFromWishlists(gameId) {
-        fetch(`http://localhost:3000/wishlists/${gameId}`, { // Make sure this endpoint is correct
-            method: 'DELETE',
-        })
-        .then(response => {
-            if (response.ok) {
+        console.log(`Attempting to delete game with ID: ${gameId}`);
+        
+        // Check if the game exists before trying to delete it
+        fetch(`http://localhost:3000/wishlists`)
+            .then(response => response.json())
+            .then(data => {
+                const gameExists = data.some(item => item.gameId == gameId);
+                if (!gameExists) {
+                    alert(`Game with ID ${gameId} does not exist in the wishlist.`);
+                    return;
+                }
+                
+                // Proceed to delete if game exists
+                return fetch(`http://localhost:3000/wishlists/${gameId}`, {
+                    method: 'DELETE',
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Log the response to see the error status and message
+                    console.error('Failed to remove game. Status:', response.status, 'Status Text:', response.statusText);
+                    throw new Error('Failed to remove the game.');
+                }
                 alert('Game removed from wishlist.');
                 fetchWishlist(); // Refresh the wishlist after removal
-            } else {
-                throw new Error('Failed to remove the game.'); // Handle error response
-            }
-        })
-        .catch(error => {
-            console.error('Error removing from wishlist:', error);
-            alert('There was an error removing the game from your wishlist. Please try again.');
-        });
+            })
+            .catch(error => {
+                console.error('Error removing from wishlist:', error);
+                alert('There was an error removing the game from your wishlist. Please try again.');
+            });
     }
-});
+    
+    }
+    
+    
+);
 
