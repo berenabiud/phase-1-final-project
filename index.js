@@ -1,26 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // These lines select specific HTML elements by their IDs and assign them to constants for easy reference later in the code.
     const gameForm = document.getElementById('game-form');
     const gameList = document.getElementById('game-list');
     const ratingFilter = document.getElementById('rating-filter');
     const releaseYearFilter = document.getElementById('release-year-filter');
 
-    
-    const apiKey = 'bdaadfbc69b6442fb0a533ec2d7ccf87';//this is an api key that alllows me to access the games from from the aoi
+    const apiKey = 'bdaadfbc69b6442fb0a533ec2d7ccf87'; // Replace with your actual RAWG API key.
 
-    //this line listens to the events
+    // Event listener for the form submit
     gameForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const gameTitle = document.getElementById('game-title').value;
         const gameGenre = document.getElementById('game-genre').value;
-
-        // Fetch and render game data from RAWG API
-        fetchGameData(gameTitle, gameGenre);//Calls the fetchGameData function passing the game title and game genre as parameters
+        fetchGameData(gameTitle, gameGenre);
     });
 
     // Function to fetch game data from RAWG API
     function fetchGameData(title, genre) {
-        const apiUrl = `https://api.rawg.io/api/games?key=${apiKey}&search=${title}`;
+        let apiUrl = `https://api.rawg.io/api/games?key=${apiKey}&search=${title}`;
         if (genre) {
             apiUrl += `&genres=${genre.toLowerCase()}`;
         }
@@ -31,16 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 applyFilters(data.results);
             })
             .catch(error => {
-                console.error('Error fetching data:', error);//fetches any error during the fetch process
+                console.error('Error fetching data:', error);
             });
     }
 
-    // Function to apply filters for rating and release year
+    // Function to apply rating and release year filters
     function applyFilters(games) {
-        const filteredGames = games.filter(game => {//Uses the filter method to create a new array with games that match the criteria.
+        const filteredGames = games.filter(game => {
             const selectedRating = ratingFilter.value;
             const selectedYear = releaseYearFilter.value;
-            
+
             let matchesRating = true;
             if (selectedRating) {
                 matchesRating = Math.floor(game.rating) >= parseInt(selectedRating);
@@ -54,12 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchesRating && matchesYear;
         });
 
-        renderGames(filteredGames);//Calls the renderGames function to display the filtered games
+        renderGames(filteredGames);
     }
 
-    function renderGames(games) {// takes an array of games and render them on display
-        // Clear any previous results
-        gameList.innerHTML = '';
+    // Function to render the games with user rating feature
+    function renderGames(games) {
+        gameList.innerHTML = ''; // Clear previous results
 
         if (games.length === 0) {
             gameList.innerHTML = `<p class="text-center">No games found</p>`;
@@ -67,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         games.forEach(game => {
+            // Generate a unique ID for each game to associate user ratings.
+            const gameId = game.id;
+
             const gameCard = `
                 <div class="col">
                     <div class="card h-100">
@@ -76,7 +75,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p class="card-text">Genre: ${game.genres.map(genre => genre.name).join(', ')}</p>
                             <p class="card-text">Rating: ★${'★'.repeat(Math.floor(game.rating))} (${game.rating}/5)</p>
                             <p class="card-text">Release Year: ${game.released ? game.released.substring(0, 4) : 'N/A'}</p>
-                            <button class="btn btn-primary">Details</button>
+                            
+                            <!-- User Rating Form -->
+                            <div>
+                                <label for="user-rating-${gameId}">Your Rating:</label>
+                                <input type="number" id="user-rating-${gameId}" class="form-control" min="1" max="5" placeholder="Rate 1-5">
+                                <button class="btn btn-primary mt-2" onclick="submitUserRating(${gameId}, '${game.name}')">Submit Rating</button>
+                            </div>
+
+                            <p id="user-rating-display-${gameId}" class="mt-3"></p>
                         </div>
                     </div>
                 </div>
@@ -84,4 +91,24 @@ document.addEventListener('DOMContentLoaded', () => {
             gameList.innerHTML += gameCard;
         });
     }
+
+    // Function to handle user rating submission
+    window.submitUserRating = function(gameId, gameName) {
+        const userRatingInput = document.getElementById(`user-rating-${gameId}`);
+        const userRatingDisplay = document.getElementById(`user-rating-display-${gameId}`);
+
+        const userRating = parseInt(userRatingInput.value);
+
+        if (userRating >= 1 && userRating <= 5) {
+            // Update the display with the user's rating
+            userRatingDisplay.innerHTML = `<strong>${gameName}</strong> - Your Rating: ★${'★'.repeat(userRating)} (${userRating}/5)`;
+
+            // Optionally, store the user rating somewhere like in localStorage
+            // localStorage.setItem(`userRating-${gameId}`, userRating);
+
+            userRatingInput.value = ''; // Clear input after submission
+        } else {
+            alert('Please enter a rating between 1 and 5.');
+        }
+    };
 });
