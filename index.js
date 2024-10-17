@@ -63,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         games.forEach(game => {
-            // Generate a unique ID for each game to associate user ratings.
             const gameId = game.id;
 
             const gameCard = `
@@ -76,11 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p class="card-text">Rating: ★${'★'.repeat(Math.floor(game.rating))} (${game.rating}/5)</p>
                             <p class="card-text">Release Year: ${game.released ? game.released.substring(0, 4) : 'N/A'}</p>
                             
-                            <!-- User Rating Form -->
                             <div>
                                 <label for="user-rating-${gameId}">Your Rating:</label>
                                 <input type="number" id="user-rating-${gameId}" class="form-control" min="1" max="5" placeholder="Rate 1-5">
-                                <button class="btn btn-primary mt-2" onclick="submitUserRating(${gameId}, '${game.name}')">Submit Rating</button>
+                                <button class="btn btn-primary mt-2" data-game-id="${gameId}" data-game-name="${game.name}">Submit Rating</button>
                             </div>
 
                             <p id="user-rating-display-${gameId}" class="mt-3"></p>
@@ -92,23 +90,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Event delegation for handling user rating submission
+    gameList.addEventListener('click', (event) => {
+        if (event.target.tagName === 'BUTTON' && event.target.hasAttribute('data-game-id')) {
+            const gameId = event.target.getAttribute('data-game-id');
+            const gameName = event.target.getAttribute('data-game-name');
+            submitUserRating(gameId, gameName);
+        }
+    });
+
     // Function to handle user rating submission
-    window.submitUserRating = function(gameId, gameName) {
+    function submitUserRating(gameId, gameName) {
         const userRatingInput = document.getElementById(`user-rating-${gameId}`);
         const userRatingDisplay = document.getElementById(`user-rating-display-${gameId}`);
-
         const userRating = parseInt(userRatingInput.value);
 
         if (userRating >= 1 && userRating <= 5) {
-            // Update the display with the user's rating
             userRatingDisplay.innerHTML = `<strong>${gameName}</strong> - Your Rating: ★${'★'.repeat(userRating)} (${userRating}/5)`;
 
-            // Optionally, store the user rating somewhere like in localStorage
+            // Optionally store the user rating in localStorage
             // localStorage.setItem(`userRating-${gameId}`, userRating);
 
             userRatingInput.value = ''; // Clear input after submission
         } else {
             alert('Please enter a rating between 1 and 5.');
         }
-    };
+    }
 });
