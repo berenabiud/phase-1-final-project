@@ -1,4 +1,3 @@
-
 h1{
     text-align: center;
 }
@@ -27,12 +26,11 @@ input {
         font-size: 16px;
     }
     body{
-        background-color: rgb(96, 73, 73);
+        background-color: rgb(60, 84, 74);
     }
 #wishlist {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap; 
+       background-color: #287a45d6;
+        
     }
     .wishlist{
         display: flex;

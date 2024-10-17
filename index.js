@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameList = document.getElementById('game-list');
     const ratingFilter = document.getElementById('rating-filter');
     const releaseYearFilter = document.getElementById('release-year-filter');
+
     const apiKey = 'bdaadfbc69b6442fb0a533ec2d7ccf87'; 
     
     // Store user ratings and wishlist locally in memory
@@ -128,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Rating saved locally:', userRatings); // Log the saved ratings for reference
         } else {
-            alert('Please enter a rating between 1 and 5.');
+            alert('User rating must not exceed 5.');
         }
     }
 
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         wishlist.push({ gameId, gameName });
-        alert(`${gameName} has been added to your wishlist.`);
+       
         fetchWishlist(); // Immediately fetch and display the wishlist after adding
     }
 
@@ -192,6 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
         wishlist.length = 0;
         wishlist.push(...updatedWishlist);
         fetchWishlist(); // Refresh the wishlist after removal
-        alert('Game removed from wishlist.');
+        // alert('Game removed from wishlist.');
     }
 });
